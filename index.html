@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peixe de Tobias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* VOICE: o tom da apresentação do grupo — sóbrio, literário.
+   IDEA: uma única carta náutica comprida; os diapositivos 16:9 estão colados uns aos outros nela.
+   PICTURE: as ilustrações em molduras de papel, rosas-dos-ventos com linhas de rumo que atravessam a carta toda.
+   COLOUR and TYPE: pergaminho #e6d3ae, tinta #2c1a10, lacre #942a1a; IM Fell English, IM Fell English SC, EB Garamond.
+   LAYOUT: faixa horizontal contínua com moldura dupla; cada diapositivo tem a altura do ecrã e 16:9 de largura. */
+:root{color-scheme:light;--bg:#d9c39a;--paper:#e6d3ae;--paper2:#efe0c2;--ink:#2c1a10;--red:#942a1a;--line:#4a3826;--rule:#a8916c;--mat:#f4ead4;
+  --fish:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 9'%3E%3Cpath d='M20 4.5C16 0 10 0 6 4.5 10 9 16 9 20 4.5zM6 4.5 0 .5v8z'/%3E%3C/svg%3E")}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;overflow:hidden}
+body{margin:0;display:flex;flex-direction:column;height:100dvh;color:var(--ink);background:var(--bg);font:18px/1.5 "EB Garamond",Garamond,Georgia,serif}
+h1,h2,h3,p,ul,figure,blockquote{margin:0}
+img{display:block}
+.fell{font-family:"IM Fell English",Georgia,serif;font-weight:400}
+.sc{font-family:"IM Fell English SC",Georgia,serif;color:var(--red);letter-spacing:.06em}
+em,.red{color:var(--red)}
+q{quotes:"“" "”"}
+
+nav{flex:none;background:#d9c39a;border-bottom:1px solid var(--rule);z-index:3}
+#navs{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 12px}
+#navs::-webkit-scrollbar{display:none}
+#navs a{flex:none;display:flex;align-items:center;min-height:46px;padding:0 12px;color:var(--ink);text-decoration:none;font-family:"IM Fell English SC",serif;font-size:16px;letter-spacing:.04em}
+#navs a:hover,#navs a:focus-visible,#navs a.on{color:var(--red);outline:none}
+
+/* a faixa contínua */
+.track{flex:1;container-type:size;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior:contain}
+.track::-webkit-scrollbar{display:none}
+.strip{--u:calc(1cqh * 1.7778);position:relative;display:flex;height:100%;width:max-content;isolation:isolate;
+  background:
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E"),
+   radial-gradient(ellipse 40% 55% at 30% 35%,#f0e1c3,transparent 70%) 0 0/150cqh 100%,
+   radial-gradient(ellipse 35% 50% at 75% 90%,#cdb184,transparent 70%) 0 0/210cqh 100%,
+   radial-gradient(ellipse 30% 40% at 10% 100%,#d2b88b,transparent 70%) 0 0/270cqh 100%,
+   var(--paper)}
+.strip::before{content:"";position:absolute;inset:calc(var(--u)*.9);border:calc(var(--u)*.22) solid var(--line);z-index:-1;pointer-events:none}
+.strip::after{content:"";position:absolute;inset:calc(var(--u)*1.45);border:1px solid var(--line);opacity:.8;z-index:-1;pointer-events:none}
+#rhumb{position:absolute;left:0;top:0;height:100%;z-index:-2;color:#8c7350;opacity:.32;pointer-events:none}
+
+/* um diapositivo 16:9 dentro da faixa */
+.slide{position:relative;flex:none;width:calc(var(--u)*100);height:100%}
+.label{position:absolute;left:50%;bottom:calc(var(--u)*1.75);transform:translateX(-50%);white-space:nowrap;background:#eddcbb;border:1px solid #b19873;padding:calc(var(--u)*.25) calc(var(--u)*1.2);font-family:"IM Fell English SC",serif;font-size:calc(var(--u)*.95);letter-spacing:.22em}
+.compass{position:absolute;width:calc(var(--u)*17);right:calc(var(--u)*5.5);top:calc(var(--u)*2);color:#6d5a43;z-index:-1}
+.fishi{position:absolute;width:calc(var(--u)*2);color:#8b7759;z-index:-1}
+.inner{position:absolute;inset:calc(var(--u)*3) calc(var(--u)*7) calc(var(--u)*4.5);display:grid;align-items:center}
+
+.h1{font-size:calc(var(--u)*10.6);line-height:1}
+.h2{font-size:calc(var(--u)*6.2);line-height:1.02}
+.orn{display:block;width:calc(var(--u)*16);height:calc(var(--u)*1.5);color:var(--red);margin:calc(var(--u)*1.1) 0 calc(var(--u)*.6)}
+.center .orn{margin-inline:auto}
+.kick{font-size:calc(var(--u)*1.6);margin-bottom:calc(var(--u)*1.2)}
+.body{font-size:calc(var(--u)*1.8);line-height:1.5}
+.body p+p{margin-top:calc(var(--u)*.8)}
+.small{font-size:calc(var(--u)*1.55);line-height:1.5}
+.quote{font-family:"IM Fell English",serif;font-style:italic;color:var(--red);font-size:calc(var(--u)*2.9)}
+.bq{border-left:2px solid var(--red);padding-left:calc(var(--u)*1.8);margin-top:calc(var(--u)*1.8);font-family:"IM Fell English",serif;font-style:italic;font-size:calc(var(--u)*2.1);line-height:1.4}
+.moral{font-family:"IM Fell English",serif;font-style:italic;color:var(--red);font-size:calc(var(--u)*1.95);margin-top:calc(var(--u)*1.6)}
+ul.fl{list-style:none;padding:0}
+ul.fl li{position:relative;padding-left:calc(var(--u)*2.7);margin:calc(var(--u)*.45) 0}
+ul.fl li::before{content:"";position:absolute;left:0;top:.5em;width:calc(var(--u)*1.7);height:calc(var(--u)*.75);background:var(--red);-webkit-mask:var(--fish) no-repeat center/contain;mask:var(--fish) no-repeat center/contain}
+
+.pic{background:var(--mat);padding:calc(var(--u)*.7);border:1px solid #a88f69;box-shadow:inset 0 0 0 calc(var(--u)*.25) var(--mat),inset 0 0 0 calc(var(--u)*.3) #c5ad86,0 calc(var(--u)*.9) calc(var(--u)*2) calc(var(--u)*-.6) #3a260f80;justify-self:center;width:min-content}
+.pic img{height:var(--h,calc(var(--u)*28));width:auto}
+.pic figcaption{font-family:"IM Fell English",serif;font-style:italic;font-size:calc(var(--u)*1.1);text-align:center;padding-top:calc(var(--u)*.4)}
+.box{background:color-mix(in srgb,var(--paper2) 75%,transparent);border:1px solid #a88f69;box-shadow:inset 0 0 0 calc(var(--u)*.35) color-mix(in srgb,var(--paper2) 80%,transparent),inset 0 0 0 calc(var(--u)*.42) #c4ab84;padding:calc(var(--u)*1.6) calc(var(--u)*2)}
+.box h3{font-family:"IM Fell English SC",serif;font-weight:400;color:var(--red);font-size:calc(var(--u)*1.8);letter-spacing:.04em;margin-bottom:calc(var(--u)*.4)}
+.box p{font-size:calc(var(--u)*1.5);line-height:1.5}
+
+.split{display:grid;grid-template-columns:auto minmax(0,1fr);gap:calc(var(--u)*5);align-items:center}
+.split.r{grid-template-columns:minmax(0,1fr) auto}
+.center{text-align:center;justify-items:center}
+.duo{display:flex;align-items:center;gap:calc(var(--u)*1.6)}
+.duo .pic:first-child{transform:rotate(-2deg)}.duo .pic:last-child{transform:rotate(1.5deg)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*1.2)}
+.rec{display:grid;gap:calc(var(--u)*1)}
+.rec .box{display:grid;grid-template-columns:calc(var(--u)*14) minmax(0,1fr);align-items:baseline;padding:calc(var(--u)*.9) calc(var(--u)*1.6)}
+.rec b{font-family:"IM Fell English SC",serif;font-weight:400;color:var(--red);font-size:calc(var(--u)*1.75);letter-spacing:.04em}
+.rec i{font-family:"IM Fell English",serif;font-size:calc(var(--u)*1.85)}
+.rec span{font-size:calc(var(--u)*1.8)}
+
+.who{position:absolute;left:calc(var(--u)*3.5);top:calc(var(--u)*3.6);font-size:calc(var(--u)*1.2);line-height:1.6}
+.who .sc{display:inline-block;margin-top:calc(var(--u)*.4);border-top:1px solid var(--red);border-bottom:1px solid var(--red);padding:0 calc(var(--u)*.5);font-size:calc(var(--u)*.95)}
+.esco{position:absolute;right:calc(var(--u)*6);top:calc(var(--u)*2.4);width:calc(var(--u)*15);mix-blend-mode:multiply}
+.hint{font-family:"IM Fell English",serif;font-style:italic;color:var(--red);font-size:calc(var(--u)*1.5);margin-top:calc(var(--u)*2.4);display:inline-flex;gap:.5em;align-items:center}
+.hint svg{width:calc(var(--u)*4.5);height:calc(var(--u)*1.2)}
+.tag{display:inline-block;border-top:1px solid var(--red);border-bottom:1px solid var(--red);padding:0 calc(var(--u)*1);font-size:calc(var(--u)*1.15);letter-spacing:.14em;margin-bottom:calc(var(--u)*1.2)}
+.lead{font-size:calc(var(--u)*2.9);line-height:1.4;max-width:36ch}
+.lead q{font-family:"IM Fell English",serif;font-style:italic;color:var(--red)}
+.thanks{font-size:calc(var(--u)*11);font-style:italic;color:var(--red);line-height:1}
+.logos{width:calc(var(--u)*42);background:#fff;padding:calc(var(--u)*.5);border:1px solid #a88f69;margin-top:calc(var(--u)*1.6)}
+
+.ctrl{flex:none;display:flex;align-items:center;gap:14px;padding:6px max(2vw,12px) 8px}
+.ctrl button{flex:none;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#eddcbb;color:var(--red);font:22px/1 "IM Fell English",serif;cursor:pointer;box-shadow:inset 0 0 0 3px #eddcbb,inset 0 0 0 4px #c4ab84}
+.ctrl button:hover{background:var(--paper2)}.ctrl button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.ctrl button:disabled{opacity:.35;cursor:default}
+.prog{flex:1;position:relative;height:30px}
+.prog::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed var(--line)}
+.prog i{position:absolute;left:0;top:50%;height:2px;margin-top:-1px;background:var(--red);width:0}
+.prog svg{position:absolute;top:50%;width:34px;height:14px;margin:-7px 0 0 -17px;left:0;color:var(--red)}
+.where{flex:none;font-family:"IM Fell English SC",serif;letter-spacing:.06em;font-size:16px;min-width:12ch;text-align:center}
+.where b{color:var(--red);font-weight:400}
+@media (max-width:600px){.where{display:none}}
+
+.rv{opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .8s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+/* TEMPORÁRIO: marca os slides novos — apagar esta regra e os <span class="novo"> quando já não for preciso */
+.novo{position:absolute;left:calc(var(--u)*3.4);top:calc(var(--u)*3.4);width:calc(var(--u)*3.2);height:calc(var(--u)*3.2);border-radius:50%;background:#d81e16;box-shadow:0 0 0 calc(var(--u)*.5) #d81e1640;z-index:4}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="orn" viewBox="0 0 160 14"><path d="M2 8c8-6 16 4 24-1s12-5 18-1 10 3 14-1" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M68 3.5l3.5 3.5-3.5 3.5-3.5-3.5z" fill="currentColor"/><path d="M78 7h80" stroke="#4a3826" stroke-width="1"/></symbol>
+  <symbol id="ornc" viewBox="0 0 160 14"><path d="M0 7h68M92 7h68" stroke="#4a3826"/><path d="M72 7c3-4 6 2 8 0s5-4 8 0" fill="none" stroke="#942a1a" stroke-width="1.3"/></symbol>
+  <symbol id="rose" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-width="1.1"/>
+    <circle cx="100" cy="100" r="75" fill="none" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 3"/>
+    <g fill="currentColor" opacity=".75">
+      <path d="M140 16 102 98 98 96z"/><path d="M60 184 98 102 102 104z"/><path d="M18 62 99 98 97 102z"/><path d="M182 138 101 102 103 98z"/>
+      <path d="M100 38 103 96 97 96z"/><path d="M100 162 103 104 97 104z"/><path d="M48 92 98 99 98 103z"/><path d="M152 108 102 101 102 97z"/>
+      <path d="M62 62 99 98 97 100z"/><path d="M138 138 101 102 103 100z"/><path d="M138 62 102 99 100 97z"/><path d="M62 138 98 101 100 103z"/>
+    </g>
+    <g fill="#a2493a" opacity=".85"><path d="M140 16 101 99 100 95z"/><path d="M60 184 99 101 100 105z"/><path d="M18 62 99 99 96 100z"/><path d="M182 138 101 101 104 100z"/></g>
+    <circle cx="100" cy="100" r="4" fill="#f1e4c8" stroke="currentColor"/>
+    <text x="152" y="12" font-family="IM Fell English,serif" font-style="italic" font-size="16" fill="#a2493a" transform="rotate(20 152 12)">N</text>
+  </symbol>
+  <symbol id="fish" viewBox="0 0 40 16"><path d="M38 8C33 2 22 1 13 8c9 7 20 6 25 0zM13 8 3 2v12z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M22 5v6M25 4.5v7M28 5v6" stroke="currentColor" stroke-width=".9"/><circle cx="33" cy="7" r="1" fill="currentColor"/></symbol>
+</svg>
+
+<nav aria-label="Secções"><div id="navs"></div></nav>
+
+<div class="track" id="track">
+<main class="strip" id="strip">
+<svg id="rhumb" aria-hidden="true"></svg>
+
+<section class="slide" id="capa" data-n="Capa">
+  <svg class="fishi" style="left:55%;top:3%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="who">Daniel Ribeiro <b>n.º 7</b><br>Mauro Junior <b>n.º 16</b><br>Tomás Ferreira <b>n.º 21</b><br><span class="sc">PSI9</span></div>
+  <img class="esco" src="img/esco.jpg" alt="ESCO — Escola de Serviços e Comércio do Oeste">
+  <div class="inner center" style="align-content:center"><div class="rv">
+    <h1 class="fell h1"><span class="red">P</span>eixe de <em>Tobias</em></h1>
+    <svg class="orn" style="width:calc(var(--u)*19)"><use href="#ornc"/></svg>
+    <p class="fell" style="font-style:italic;font-size:calc(var(--u)*2.6);margin-top:calc(var(--u)*.8)">Sermão de Santo António aos Peixes</p>
+    <p class="sc" style="font-size:calc(var(--u)*1.6);letter-spacing:.14em;margin-top:calc(var(--u)*.6)">Padre António Vieira</p>
+    <p class="sc" style="color:var(--ink);font-size:calc(var(--u)*1.25);letter-spacing:.3em;margin-top:calc(var(--u)*6)">S. Luís do Maranhão · 1654</p>
+    <p class="hint">Desliza para o lado <svg viewBox="0 0 60 16"><path d="M0 8h54M46 2l8 6-8 6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></p>
+  </div></div>
+  <span class="label">Sermão de Santo António aos Peixes</span>
+</section>
+
+<section class="slide" id="introducao" data-n="Introdução">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:53%;top:6%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split">
+    <figure class="pic rv" style="--h:calc(var(--u)*28)"><img src="img/vieira.jpg" alt="Retrato do Padre António Vieira"></figure>
+    <div class="rv">
+      <h2 class="fell h2">Introdução</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">O Sermão de Santo António aos Peixes</p>
+      <p class="body">Pregado por Padre António Vieira em São Luís do Maranhão, em 1654.</p>
+      <p class="quote" style="margin-top:calc(var(--u)*1.6)">“Vos estis sal terrae”</p>
+      <p class="sc" style="color:var(--ink);font-size:calc(var(--u)*1.3);letter-spacing:.14em;margin-top:calc(var(--u)*.6)">Conceito predicável</p>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="sal" data-n="O sal da terra">
+  <span class="novo" title="Slide novo (temporário)"></span>
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:58%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner center"><div class="rv" style="display:grid;justify-items:center;width:100%;padding-top:calc(var(--u)*5)">
+    <span class="sc tag">13 de junho de 1654 · dia de Santo António</span>
+    <h2 class="fell h2">“Vos estis <em>sal terrae</em>”</h2>
+    <svg class="orn" style="width:calc(var(--u)*19)"><use href="#ornc"/></svg>
+    <p class="sc kick">“Vós sois o sal da terra” — palavras de Cristo aos discípulos</p>
+    <p class="body" style="max-width:62ch">Os pregadores devem ser para a terra o que o sal é para a comida: aquilo que a conserva e a impede de apodrecer. Então, se há tantos pregadores, porque está a terra tão corrompida?</p>
+    <div class="g2" style="text-align:left;gap:calc(var(--u)*2);margin-top:calc(var(--u)*2.2);width:100%">
+      <div class="box"><h3>“Ou é porque o sal não salga”</h3><p>A culpa é dos pregadores, que não pregam a verdadeira doutrina.</p></div>
+      <div class="box"><h3>“Ou porque a terra se não deixa salgar”</h3><p>A culpa é dos ouvintes, que não a querem seguir — como os colonos do Maranhão.</p></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="estrutura" data-n="O primeiro peixe">
+  <span class="novo" title="Slide novo (temporário)"></span>
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:44%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split r" style="gap:calc(var(--u)*5)">
+    <div class="rv">
+      <h2 class="fell h2">O Primeiro <em>Peixe Louvado</em></h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">Onde está o peixe no Sermão</p>
+      <p class="body">Como os homens não o ouviam, Vieira fez como Santo António em Rimini: virou-se para o mar e pregou aos peixes. Ao falar dos peixes, está na verdade a falar dos homens.</p>
+      <p class="moral">O Peixe de Tobias é o primeiro peixe louvado — por isso é um exemplo a seguir.</p>
+    </div>
+    <div class="rec rv" style="width:calc(var(--u)*36)">
+      <div class="box"><b>Capítulo I</b><span>O sal da terra e a pregação aos peixes</span></div>
+      <div class="box" style="outline:2px solid var(--red);outline-offset:calc(var(--u)*.3)"><b>Cap. II e III</b><span>Louvor das <b class="red" style="font-size:inherit">virtudes</b> — aqui está o Peixe de Tobias</span></div>
+      <div class="box"><b>Cap. IV e V</b><span>Repreensão dos <b class="red" style="font-size:inherit">vícios</b></span></div>
+      <div class="box"><b>Capítulo VI</b><span>Conclusão do sermão</span></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+
+<section class="slide" id="peixe" data-n="O Peixe">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:51%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split">
+    <div class="duo rv">
+      <figure class="pic" style="--h:calc(var(--u)*14.5)"><img src="img/peixe1.jpg" alt="Siluro seguro nas mãos"></figure>
+      <figure class="pic" style="--h:calc(var(--u)*21)"><img src="img/peixe2.jpg" alt="Siluro visto de frente, sobre pedras"></figure>
+    </div>
+    <div class="rv" style="padding-top:calc(var(--u)*6)">
+      <h2 class="fell h2">O Peixe</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">Livro de Tobias, capítulo 6</p>
+      <ul class="fl body">
+        <li>Ataca Tobias no rio Tigre (atual Iraque)</li>
+        <li>A Bíblia apenas o descreve como “grande”</li>
+        <li>Hipótese: um peixe-gato (siluro)</li>
+        <li>Grande porte, sem escamas</li>
+        <li>Predador de rio, agressivo</li>
+      </ul>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="sermao" data-n="No Sermão">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:50%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split r">
+    <div class="rv">
+      <h2 class="fell h2">No Sermão</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">Capítulo III</p>
+      <ul class="fl body">
+        <li>Tobias lava os pés no rio e o peixe ataca-o</li>
+        <li>O anjo Rafael manda guardar o fel e o coração</li>
+        <li>O fel cura a cegueira do pai de Tobias</li>
+        <li>O coração expulsa o demónio Asmodeu</li>
+      </ul>
+      <p class="bq">“Um peixe de tão bom coração e de tão proveitoso fel, quem o não louvará muito?”</p>
+      <p class="moral">O que parecia um perigo era, afinal, uma ajuda.</p>
+    </div>
+    <figure class="pic rv" style="--h:calc(var(--u)*34)"><img src="img/cap3.jpg" alt="Ilustração: Tobias cura a cegueira do pai com o fel do peixe"><figcaption>O fel do peixe cura a cegueira do pai</figcaption></figure>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="exemplo" data-n="Exemplo positivo">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:48%;top:6%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner center" style="right:calc(var(--u)*12)"><div class="rv" style="display:grid;justify-items:center">
+    <span class="sc tag">Um peixe para admirar e imitar</span>
+    <h2 class="fell h2" style="font-size:calc(var(--u)*7)">Exemplo <em>Positivo</em></h2>
+    <svg class="orn" style="width:calc(var(--u)*19)"><use href="#ornc"/></svg>
+    <p class="lead" style="margin-top:calc(var(--u)*1.4)">Vieira chama-lhe <q>santo peixe</q> e diz que é <q>grande</q> nas virtudes interiores. Termina com a pergunta <q>quem o não louvará muito?</q>, mostrando que, entre todos os peixes, é o que mais se destaca.</p>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="grandeza" data-n="Grandeza interior">
+  <span class="novo" title="Slide novo (temporário)"></span>
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:40%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner center" style="right:calc(var(--u)*12)"><div class="rv" style="display:grid;justify-items:center">
+    <span class="sc tag">O que faz o peixe “grande”</span>
+    <h2 class="fell h2">A Verdadeira <em>Grandeza</em></h2>
+    <svg class="orn" style="width:calc(var(--u)*19)"><use href="#ornc"/></svg>
+    <p class="lead" style="margin-top:calc(var(--u)*1.6)">A Bíblia só lhe chama <q>grande</q>, mas Vieira explica que o foi <q>nas virtudes interiores, em que só consiste a verdadeira grandeza</q>.</p>
+    <p class="moral" style="margin-top:calc(var(--u)*2.4)">O valor de alguém está no seu interior — no “coração” e nas “entranhas” — e não no exterior.</p>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+
+<section class="slide" id="resumo" data-n="Resumo">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:47%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split">
+    <figure class="pic rv" style="--h:calc(var(--u)*34)"><img src="img/resumo.jpg" alt="Ilustração: o anjo Rafael, Tobias e o peixe no rio Tigre"><figcaption>Tobias, o anjo Rafael e o peixe · rio Tigre</figcaption></figure>
+    <div class="rv">
+      <h2 class="fell h2">Resumo</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">Por palavras nossas</p>
+      <p class="body">Tobias, com o anjo Rafael, foi lavar os pés ao rio e um peixe enorme atacou-o. O anjo mandou-o puxá-lo para terra e guardar as entranhas: o <b>fel</b> curou a cegueira do pai e o <b>coração</b> expulsou o demónio Asmodeu.</p>
+      <p class="moral">O peixe que parecia um perigo acabou por ser uma ajuda.</p>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="retrato" data-n="Retrato marítimo">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:46%;top:4%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner" style="left:calc(var(--u)*4.5)"><div class="split">
+    <figure class="pic rv" style="--h:calc(var(--u)*34)"><img src="img/retrato.jpg" alt="Ilustração: Santo António prega aos peixes"><figcaption>Santo António prega aos peixes</figcaption></figure>
+    <div class="rv">
+      <h2 class="fell h2">Retrato <em>Marítimo</em></h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">O peixe e Santo António</p>
+      <p class="body">Santo António também <b>“abria a boca”</b> contra os hereges, que se assustavam como Tobias — mas só queria curar a sua cegueira.</p>
+      <div class="box" style="margin-top:calc(var(--u)*2)"><h3>A diferença</h3><p>O peixe atacou quem se lavava; o santo atacava quem não se queria “lavar” dos pecados.</p></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="significado" data-n="Significado">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:43%;top:4%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner center"><div class="rv" style="display:grid;justify-items:center;width:100%;padding-top:calc(var(--u)*6)">
+    <h2 class="fell h2">O Significado <em>do Peixe</em></h2>
+    <svg class="orn" style="width:calc(var(--u)*19)"><use href="#ornc"/></svg>
+    <p class="sc kick">A intenção de Vieira</p>
+    <div class="g2" style="text-align:left;gap:calc(var(--u)*2);margin-top:calc(var(--u)*2);width:100%">
+      <div class="box"><h3>Qualidade humana</h3><p>A verdadeira grandeza interior: a bondade de quem diz verdades difíceis para abrir os olhos dos outros. O valor está no “coração”, não no exterior.</p></div>
+      <div class="box"><h3>Elogio e crítica</h3><p>Elogia quem corrige os outros por amor. Critica quem persegue quem o quer ajudar, como os colonos do Maranhão contra Vieira.</p></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="perseguicao" data-n="Porque perseguiam Vieira">
+  <span class="novo" title="Slide novo (temporário)"></span>
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:36%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split" style="gap:calc(var(--u)*5)">
+    <div class="rv" style="width:calc(var(--u)*38)">
+      <p class="fell" style="font-style:italic;font-size:calc(var(--u)*3.4);line-height:1.3;border-left:3px solid var(--red);padding-left:calc(var(--u)*2.2)">“Pois a quem vos quer tirar as cegueiras, a quem vos quer livrar dos demónios, <span class="red">vós perseguis?!</span>”</p>
+      <p class="sc" style="color:var(--ink);font-size:calc(var(--u)*1.3);letter-spacing:.14em;margin-top:calc(var(--u)*1.4);padding-left:calc(var(--u)*2.4)">A frase-chave do excerto</p>
+    </div>
+    <div class="rv">
+      <h2 class="fell h2">Porque <em>Perseguiam</em> Vieira</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">A crítica aos colonos do Maranhão</p>
+      <p class="body">Os colonizadores revoltavam-se contra Vieira porque ele denunciava:</p>
+      <ul class="fl body">
+        <li>a <b>escravatura dos índios</b></li>
+        <li>a <b>apropriação das suas terras</b></li>
+      </ul>
+      <p class="body" style="margin-top:calc(var(--u)*1)">Como ninguém o escutava, pouco depois partiu para Lisboa, para tentar cortar o problema pela raiz.</p>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+
+<section class="slide" id="homem" data-n="O Peixe e o Homem">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:43%;top:3%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner" style="left:calc(var(--u)*4.5)"><div class="split r" style="gap:calc(var(--u)*4)">
+    <div class="rv">
+      <h2 class="fell h2">O Peixe e <em>o Homem</em></h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">Significado simbólico — o peixe é o pregador</p>
+      <div class="g2">
+        <div class="box"><h3>Boca aberta</h3><p>A pregação firme que assusta</p></div>
+        <div class="box"><h3>Fel amargo</h3><p>A verdade que custa, mas cura</p></div>
+        <div class="box"><h3>Coração</h3><p>O amor que afasta do pecado</p></div>
+        <div class="box"><h3>“Grande” por dentro</h3><p>O valor está no interior</p></div>
+      </div>
+      <p class="small" style="margin-top:calc(var(--u)*1.4)"><b class="red">Crítica:</b> <i>os colonos do Maranhão perseguiam quem os queria ajudar.</i></p>
+    </div>
+    <figure class="pic rv" style="--h:calc(var(--u)*30)"><img src="img/homem.jpg" alt="Ilustração: o peixe e o pregador, ligados pelo coração e pelo fel"><figcaption>O peixe representa o pregador</figcaption></figure>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="entranhas" data-n="Abrir as entranhas">
+  <span class="novo" title="Slide novo (temporário)"></span>
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:48%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split r" style="gap:calc(var(--u)*5)">
+    <div class="rv">
+      <h2 class="fell h2">Abrir as <em>Entranhas</em></h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">O quinto símbolo</p>
+      <p class="body">Tobias só descobriu o valor do peixe quando o abriu. Abrir as entranhas é <b>olhar para o interior e as intenções de uma pessoa antes de a julgar</b>.</p>
+      <p class="bq">“Abri, abri estas entranhas; vede, vede este coração.”</p>
+    </div>
+    <div class="stack rv" style="width:calc(var(--u)*34);gap:calc(var(--u)*1.6)">
+      <div class="box"><h3>Fel</h3><p>Líquido produzido pelo fígado e guardado na vesícula biliar. É amargo, mas curou a cegueira.</p></div>
+      <div class="box"><h3>Entranhas</h3><p>Os órgãos de dentro do peixe — o que não se costuma comer.</p></div>
+      <div class="box"><h3>Lição</h3><p>Antes de reagir, devemos perceber as verdadeiras intenções dos outros.</p></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+
+<section class="slide" id="atualidade" data-n="Atualidade">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:40%;top:3%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split" style="gap:calc(var(--u)*4)">
+    <figure class="pic rv" style="--h:calc(var(--u)*24)"><img src="img/mascara.jpg" alt="Pessoa com máscara cirúrgica"></figure>
+    <div class="rv">
+      <h2 class="fell h2">Atualidade</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">A mensagem ainda hoje</p>
+      <p class="body"><b>Exemplo:</b> o início da pandemia de covid-19.</p>
+      <ul class="fl body">
+        <li>Pedia-se: fiquem em casa, mantenham distâncias</li>
+        <li>Muitos ignoraram os avisos e a pandemia alastrou</li>
+      </ul>
+      <div class="box" style="margin-top:calc(var(--u)*1.4)"><p><b class="red">Ligação:</b> tal como os colonos, rejeitamos quem nos avisa, mesmo quando é para nosso bem.</p></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="recursos" data-n="Recursos expressivos">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:39%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split" style="gap:calc(var(--u)*4)">
+    <div class="rv">
+      <h2 class="fell h2">Recursos<br><em>Expressivos</em></h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">No capítulo III</p>
+      <figure class="pic" style="--h:calc(var(--u)*17);justify-self:start"><img src="img/livro.jpg" alt="Ilustração: livro aberto do Sermão, com pena e tinteiro"></figure>
+    </div>
+    <div class="rec rv" style="padding-top:calc(var(--u)*6)">
+      <div class="box"><b>Apóstrofe</b><i>“Ah moradores do Maranhão”</i></div>
+      <div class="box"><b>Anáfora</b><i>“Abri, abri estas entranhas”</i></div>
+      <div class="box"><b>Ironia</b><i>“Eu não prego a vós, prego aos peixes”</i></div>
+      <div class="box"><b>Comparação</b><i>“retrato marítimo de Santo António”</i></div>
+      <div class="box"><b>Alegoria</b><span>o peixe representa o pregador</span></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="recursos2" data-n="Mais recursos">
+  <span class="novo" title="Slide novo (temporário)"></span>
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:42%;top:5%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner center"><div class="rv" style="display:grid;justify-items:center;width:100%">
+    <h2 class="fell h2">Recursos <em>Expressivos</em></h2>
+    <svg class="orn" style="width:calc(var(--u)*19)"><use href="#ornc"/></svg>
+    <p class="sc kick">Os exemplos completos</p>
+    <div class="rec" style="text-align:left;width:calc(var(--u)*64);margin-top:calc(var(--u)*1.4)">
+      <div class="box"><b>Apóstrofe</b><i>“Ah moradores do Maranhão” · “Ah homens”</i></div>
+      <div class="box"><b>Anáfora</b><i>“Abri, abri estas entranhas; vede, vede este coração”</i></div>
+      <div class="box"><b>Interrogação</b><i>“quem o não louvará muito?”</i></div>
+    </div>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+
+<section class="slide" id="criticar" data-n="Criticar sem atacar">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:37%;top:4%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner"><div class="split r">
+    <div class="rv">
+      <h2 class="fell h2">Significado <em>do Peixe</em></h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">Criticar sem atacar</p>
+      <div class="body"><p>O Peixe de Tobias serve para distinguir quem faz o bem de quem faz o mal.</p><p>Criticar através de um peixe foi a melhor forma: as pessoas sentem-se menos atacadas.</p></div>
+      <p class="bq">Por isso Vieira diz “Eu não prego a vós, prego aos peixes”.</p>
+    </div>
+    <figure class="pic rv" style="--h:calc(var(--u)*34)"><img src="img/prego.jpg" alt="Ilustração: Vieira prega aos peixes enquanto os colonos observam"><figcaption>“Eu não prego a vós, prego aos peixes”</figcaption></figure>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="conclusao" data-n="Conclusão">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:36%;top:6%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner" style="align-items:start;padding-top:calc(var(--u)*4)"><div class="split r" style="gap:calc(var(--u)*4);align-items:start">
+    <div class="rv">
+      <h2 class="fell h2">Conclusão</h2>
+      <svg class="orn"><use href="#orn"/></svg>
+      <p class="sc kick">O que aprendemos</p>
+      <div class="g2" style="gap:calc(var(--u)*1.6)">
+        <div class="box"><h3>Mais interessante</h3><p>Vieira critica os colonos de forma indireta, através de um peixe: “Eu não prego a vós, prego aos peixes”.</p></div>
+        <div class="box"><h3>Lição</h3><p>Nem todas as pessoas que nos contrariam nos querem mal.</p></div>
+      </div>
+      <p class="bq">“Quem nos corrige é, muitas vezes, quem mais nos quer bem.”</p>
+    </div>
+    <figure class="pic rv" style="--h:calc(var(--u)*15.5);margin-top:calc(var(--u)*7)"><img src="img/bacalhau.jpg" alt="Aguarela de um peixe"></figure>
+  </div></div>
+  <span class="label"></span>
+</section>
+
+<section class="slide" id="obrigado" data-n="Obrigado">
+  <svg class="compass" data-rose><use href="#rose"/></svg>
+  <svg class="fishi" style="left:33%;top:4%" viewBox="0 0 40 16"><use href="#fish"/></svg>
+  <div class="inner center" style="align-content:start;padding-top:calc(var(--u)*2)"><div class="rv" style="display:grid;justify-items:center">
+    <p class="fell thanks">Obrigado</p>
+    <svg viewBox="0 0 160 4" style="width:calc(var(--u)*9.5);margin-top:calc(var(--u)*.4)"><path d="M0 2h160" stroke="#2c1a10"/></svg>
+    <p class="body" style="margin-top:calc(var(--u)*.6)">Mauro Junior n.º 16 · Tomás Ferreira n.º 21 · Daniel Ribeiro n.º 7 · PSI9</p>
+    <p style="font-style:italic;font-size:calc(var(--u)*1.05);max-width:72ch;margin-top:calc(var(--u)*2)">Fontes: Bíblia, Livro de Tobias, cap. 6 · Sermão de Santo António aos Peixes (transcrição do Agr. de Escolas Tomás Cabreiro) · agron.com.br/peixes · Imagens: Canva</p>
+    <img class="logos" src="img/logos.jpg" alt="Logótipos de parceiros e financiamento da escola">
+  </div></div>
+  <span class="label">Sermão de Santo António aos Peixes</span>
+</section>
+
+</main>
+</div>
+
+<div class="ctrl">
+  <button id="prev" aria-label="Diapositivo anterior">‹</button>
+  <div class="prog" aria-hidden="true"><i id="bar"></i><svg id="pfish" viewBox="0 0 40 16"><use href="#fish"/></svg></div>
+  <span class="where" id="where"></span>
+  <button id="next" aria-label="Diapositivo seguinte">›</button>
+</div>
+
+<script>
+{
+  const track = document.getElementById('track');
+  const strip = document.getElementById('strip');
+  const rhumb = document.getElementById('rhumb');
+  const slides = [...strip.querySelectorAll('.slide')];
+  const navs = document.getElementById('navs');
+  const bar = document.getElementById('bar'), pfish = document.getElementById('pfish');
+  const where = document.getElementById('where');
+  const prev = document.getElementById('prev'), next = document.getElementById('next');
+
+  const roman = n => [[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']].reduce((r,[v,l]) => { while (n >= v) { r += l; n -= v } return r }, '');
+  slides.slice(1, -1).forEach((sl, i) => sl.querySelector('.label').textContent = roman(i + 1));
+  navs.innerHTML = slides.map((s, i) => `<a href="#${s.id}" data-i="${i}">${s.dataset.n}</a>`).join('');
+  const links = [...navs.querySelectorAll('a')];
+
+  // linhas de rumo que atravessam a carta toda
+  const drawRhumb = () => {
+    const W = strip.scrollWidth, H = strip.clientHeight, sr = strip.getBoundingClientRect();
+    rhumb.setAttribute('width', W);
+    rhumb.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    let d = `M0 ${H * .26}H${W}M0 ${H * .74}H${W}`;
+    slides.forEach(s => d += `M${s.offsetLeft + s.offsetWidth * .14} 0V${H}M${s.offsetLeft + s.offsetWidth * .43} 0V${H}`);
+    const L = H * 3;
+    strip.querySelectorAll('[data-rose]').forEach((c, k) => {
+      const r = c.getBoundingClientRect();
+      const cx = r.left - sr.left + r.width / 2, cy = r.top - sr.top + r.height / 2;
+      for (let a = 0; a < 16; a++) {
+        const t = (a / 16) * Math.PI * 2 + k * .21;
+        d += `M${cx} ${cy}L${cx + Math.cos(t) * L} ${cy + Math.sin(t) * L}`;
+      }
+    });
+    rhumb.innerHTML = `<path d="${d}" stroke="currentColor" stroke-width="1" fill="none"/>`;
+  };
+
+  let cur = -1;
+  const update = () => {
+    const max = track.scrollWidth - track.clientWidth;
+    const f = max > 0 ? track.scrollLeft / max : 0;
+    bar.style.width = f * 100 + '%';
+    pfish.style.left = f * 100 + '%';
+    prev.disabled = track.scrollLeft < 4;
+    const mid = track.scrollLeft + track.clientWidth / 2;
+    let i = slides.findIndex(s => s.offsetLeft + s.offsetWidth > mid);
+    if (i < 0 || track.scrollLeft >= max - 2) i = slides.length - 1;
+    next.disabled = track.scrollLeft >= max - 2;
+    if (i === cur) return;
+    cur = i;
+    links.forEach((a, k) => a.classList.toggle('on', k === i));
+    const a = links[i];
+    navs.scrollTo({ left: a.offsetLeft - navs.clientWidth / 2 + a.clientWidth / 2, behavior: 'smooth' });
+    where.innerHTML = `<b>${i + 1}</b> / ${slides.length} · ${slides[i].dataset.n}`;
+  };
+
+  const go = (i, behavior = 'smooth') => {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    const s = slides[i];
+    track.scrollTo({ left: s.offsetLeft + s.offsetWidth / 2 - track.clientWidth / 2, behavior });
+  };
+
+  const reveal = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); reveal.unobserve(e.target) }
+  }), { root: track, threshold: .1 });
+  strip.querySelectorAll('.rv').forEach(el => reveal.observe(el));
+
+  track.addEventListener('scroll', update, { passive: true });
+
+  // a roda do rato anda para o lado
+  track.addEventListener('wheel', e => {
+    if (e.ctrlKey || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    e.preventDefault();
+    track.scrollLeft += e.deltaY * (e.deltaMode === 1 ? 32 : 1);
+  }, { passive: false });
+
+  navs.addEventListener('click', e => {
+    const a = e.target.closest('a'); if (!a) return;
+    e.preventDefault(); go(+a.dataset.i);
+  });
+  prev.addEventListener('click', () => go(cur - 1));
+  next.addEventListener('click', () => go(cur + 1));
+  addEventListener('keydown', e => {
+    if (e.key === 'Home') { e.preventDefault(); return go(0) }
+    if (e.key === 'End') { e.preventDefault(); return go(slides.length - 1) }
+    const d = { ArrowRight: 1, PageDown: 1, ArrowLeft: -1, PageUp: -1 }[e.key];
+    if (!d) return;
+    e.preventDefault(); go(cur + d);
+  });
+
+  const ro = new ResizeObserver(() => { drawRhumb(); cur = -1; update() });
+  ro.observe(track);
+  document.fonts?.ready.then(drawRhumb);
+
+  const start = slides.findIndex(s => '#' + s.id === location.hash);
+  drawRhumb();
+  if (start > 0) { go(start, 'instant'); addEventListener('load', () => go(start, 'instant')) }
+  update();
+}
+</script>
+</body>
+</html>
